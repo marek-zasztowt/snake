@@ -24,11 +24,13 @@ def display_snake():
 def generate_food():
     generate = True
     while generate:
-        x = random.randint(0 , BORDER_X // SIZE_X -1) * SIZE_X
+        generate = False
+        x = random.randint(0 , BORDER_X // SIZE_X - 1) * SIZE_X
         y = random.randint(0 , BORDER_Y // SIZE_Y - 1) * SIZE_Y
         for segment in snake_segments:
-            if segment[1] != x and segment[2] != y: 
-                generate = False
+            if (segment[1], segment[2])  == (x, y):
+                generate = True
+                break               # if segment, break checking
     return [FOOD_COLOR, x, y]
 
 def dispaly_food():
@@ -64,9 +66,7 @@ def check_next_arrea(direction):
     if direction in "R":
         x = snake_x + SIZE_X
         y = snake_y
-    if food[1] == x and food[2] == y:
-        x = food[1]
-        y = food[2]
+    if (food[1], food[2]) == (x, y):
         del food[:]
         food = generate_food().copy()
         food_couter += 1
@@ -76,8 +76,7 @@ def check_next_arrea(direction):
         else:
             print("s")
         snake_add_segment(x, y)
-        snake_x = x
-        snake_y = y
+        snake_x, snake_y = x, y
         return False
     for i in range(len(snake_segments)-1):
         if snake_segments[i][1] == x and snake_segments[i][2] == y:
@@ -98,15 +97,15 @@ DARK_GREEN = (67, 82, 61)
 BORDER_X = 500
 BORDER_Y = 500
 
+# allways to left direction
 factor = BORDER_X // SIZE_X
 DISPLAY_WIDTH = factor * SIZE_X
-factor -= 1
-snake_x = (random.randint(0 , factor) - 3) * SIZE_X
+factor -= 3     # minimum snakes lenght is 3
+snake_x = random.randint(0 , factor) * SIZE_X
 
 factor = BORDER_Y // SIZE_Y
 DISPLAY_HIGHT = factor * SIZE_Y
-factor -= 1
-snake_y = (random.randint(0 , factor) - 3) * SIZE_Y    
+snake_y = random.randint(0 , factor - 1) * SIZE_Y
 
 DISPLAY_SIZE = (DISPLAY_WIDTH, DISPLAY_HIGHT)
 
@@ -124,6 +123,7 @@ snake_segments.append(snake_segment.copy())
 snake_segments.append(snake_tail.copy())
 
 screen.fill(LIGHT_GREEN)
+pygame.display.set_caption('Feed the snake !!!')
 
 food_couter = 0
 food = []
